@@ -9,5 +9,11 @@ class Client {
         System.out.println(map);
         System.out.println(map.get("2"));
         map.remove("2");
+        System.out.println(map);
+        //map.put("2", "one");
+        map.remove("1");
+        System.out.println(map);
+        map.put("new", "new");
+        System.out.println(map);
     }
 }

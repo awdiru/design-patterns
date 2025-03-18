@@ -34,8 +34,21 @@ public class LinkedMap<K, V> implements Map<K, V> {
 
     @Override
     public V get(Object key) {
-        Node<K, V> point = getNode((K) key);
-        return point == null ? null : point.value;
+        Iterator<Entry<K, V>> iterator = entrySet().iterator();
+        if (key == null) {
+            while (iterator.hasNext()) {
+                Entry<K, V> next = iterator.next();
+                if (next.getKey() == null)
+                    return next.getValue();
+            }
+        } else {
+            while (iterator.hasNext()) {
+                Entry<K, V> next = iterator.next();
+                if (key.equals(next.getKey()))
+                    return next.getValue();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -63,16 +76,24 @@ public class LinkedMap<K, V> implements Map<K, V> {
 
     @Override
     public V remove(Object key) {
-        Node<K, V> point = getNode((K) key);
+        Node<K, V> point = first;
+        while (point != null) {
+            if (point.key.equals(key)) break;
+            point = point.next;
+        }
         if (point == null) return null;
         else if (first.key.equals(key)) {
             Node<K, V> oldFirst = first;
             first = oldFirst.next;
+            if (first != null && first.prev != null) first.prev = null;
+            size--;
             return oldFirst.value;
 
         } else if (end.key.equals(key)) {
             Node<K, V> oldEnd = end;
             end = oldEnd.prev;
+            if (end != null && end.next != null) end.next = null;
+            size--;
             return oldEnd.value;
 
         } else {
@@ -80,13 +101,14 @@ public class LinkedMap<K, V> implements Map<K, V> {
             Node<K, V> nextPoint = point.next;
             prevPoint.next = nextPoint;
             nextPoint.prev = prevPoint;
+            size--;
             return point.value;
         }
     }
 
     @Override
     public void putAll(Map<? extends K, ? extends V> map) {
-        for (Map.Entry<? extends K, ? extends V> e : map.entrySet())
+        for (Entry<? extends K, ? extends V> e : map.entrySet())
             put(e.getKey(), e.getValue());
     }
 
@@ -99,7 +121,7 @@ public class LinkedMap<K, V> implements Map<K, V> {
 
     @Override
     public Set<K> keySet() {
-        Node<K,V> point = first;
+        Node<K, V> point = first;
         Set<K> keySet = new HashSet<>(size);
         while (point != null) {
             keySet.add(point.key);
@@ -110,7 +132,7 @@ public class LinkedMap<K, V> implements Map<K, V> {
 
     @Override
     public List<V> values() {
-        Node<K,V> point = first;
+        Node<K, V> point = first;
         List<V> values = new ArrayList<>(size);
         while (point != null) {
             values.add(point.value);
@@ -122,12 +144,25 @@ public class LinkedMap<K, V> implements Map<K, V> {
     @Override
     public Set<Entry<K, V>> entrySet() {
         Node<K, V> point = first;
-        Set<Map.Entry<K, V>> entrySet = new HashSet<>(size);
+        Set<Entry<K, V>> entrySet = new HashSet<>(size);
         while (point != null) {
-            entrySet.add(new AbstractMap.SimpleEntry<>(point.key, point.value));
+            entrySet.add(new CustomEntry(point.key, point.value));
             point = point.next;
         }
         return entrySet;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        Node<K, V> point = first;
+        while (point != null && point.next != null) {
+            result.append(point).append("; ");
+            point = point.next;
+        }
+        result.append(point);
+        if (result.toString().equals("null")) return "{}";
+        return "{" + result + "}";
     }
 
     private Node<K, V> getNode(K key) {
@@ -153,6 +188,32 @@ public class LinkedMap<K, V> implements Map<K, V> {
         @Override
         public String toString() {
             return key.toString() + ": " + value.toString();
+        }
+    }
+
+    private class CustomEntry implements Entry<K, V> {
+        private final K key;
+        private V value;
+
+        public CustomEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public K getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public V setValue(V value) {
+            this.value = value;
+            return this.value;
         }
     }
 }
