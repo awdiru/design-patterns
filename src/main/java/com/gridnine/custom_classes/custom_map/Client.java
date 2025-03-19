@@ -1,4 +1,4 @@
-package com.gridnine.structure.linked_map;
+package com.gridnine.custom_classes.custom_map;
 
 class Client {
     public static void main(String[] args) {
