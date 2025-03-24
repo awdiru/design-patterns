@@ -3,7 +3,7 @@ package com.gridnine.structure.composite;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client {
+class Client {
     public static void main(String[] args) {
         Component root = new Composite("Root");
         Component leaf = new Leaf("Leaf");
@@ -34,7 +34,7 @@ abstract class Component {
 }
 
 class Composite extends Component {
-    private List<Component> children = new ArrayList<>();
+    private final List<Component> children = new ArrayList<>();
 
     public Composite(String name) {
         super(name);
@@ -52,14 +52,9 @@ class Composite extends Component {
 
     @Override
     public void display(int level) {
-        for (int i = 0; i < level; i++) {
-            System.out.print("-");
-        }
+        System.out.print("-".repeat(level) + ">");
         System.out.println(name);
-
-        for (Component component : children) {
-            component.display(level + 1);
-        }
+        for (Component component : children) component.display(level + 1);
     }
 }
 
@@ -70,9 +65,7 @@ class Leaf extends Component {
 
     @Override
     public void display(int level) {
-        for (int i = 0; i < level; i++) {
-            System.out.print("-");
-        }
+        System.out.print("-".repeat(level) + ">");
         System.out.println(name);
     }
 
