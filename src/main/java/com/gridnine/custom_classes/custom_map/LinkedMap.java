@@ -4,7 +4,7 @@ import java.util.*;
 
 public class LinkedMap<K, V> implements Map<K, V> {
     private Node<K, V> first;
-    private Node<K, V> end;
+    private Node<K, V> last;
     private int size = 0;
 
     @Override
@@ -24,77 +24,66 @@ public class LinkedMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsValue(Object value) {
-        Node<K, V> point = first;
-        while (point != null) {
-            if (point.value.equals(value)) return true;
-            point = point.next;
-        }
+        for (V v : this.values()) if (v.equals(value)) return true;
         return false;
     }
 
     @Override
     public V get(Object key) {
-        Iterator<Entry<K, V>> iterator = entrySet().iterator();
         if (key == null) {
-            while (iterator.hasNext()) {
-                Entry<K, V> next = iterator.next();
-                if (next.getKey() == null)
-                    return next.getValue();
-            }
-        } else {
-            while (iterator.hasNext()) {
-                Entry<K, V> next = iterator.next();
-                if (key.equals(next.getKey()))
-                    return next.getValue();
-            }
-        }
+            for (Node<K, V> point = first; point != null; point = point.next)
+                if (point.key == null) return point.value;
+
+        } else for (Node<K, V> point = first; point != null; point = point.next)
+            if (point.key.equals(key)) return point.value;
+
         return null;
     }
 
     @Override
     public V put(K key, V value) {
-        Node<K, V> point = getNode((K) key);
+        Node<K, V> point = getNode(key);
         if (point == null) {
             point = new Node<>(key, value);
-            if (first == null) first = point;
-            else if (size == 1) {
-                end = point;
-                end.prev = first;
-                first.next = end;
+            if (size == 0) {
+                first = point;
+                last = first;
+
+            } else if (size == 1) {
+                last = point;
+                last.prev = first;
+                first.next = last;
+
             } else {
-                Node<K, V> oldEnd = end;
-                end = point;
-                oldEnd.next = end;
-                end.prev = oldEnd;
+                Node<K, V> oldLast = last;
+                last = point;
+                oldLast.next = last;
+                last.prev = oldLast;
             }
             size++;
         } else {
-            point.value = (V) value;
+            point.value = value;
         }
         return point.value;
     }
 
     @Override
     public V remove(Object key) {
-        Node<K, V> point = first;
-        while (point != null) {
-            if (point.key.equals(key)) break;
-            point = point.next;
-        }
+        Node<K, V> point = getNode(key);
         if (point == null) return null;
         else if (first.key.equals(key)) {
             Node<K, V> oldFirst = first;
             first = oldFirst.next;
-            if (first != null && first.prev != null) first.prev = null;
+            if (first != null) first.prev = null;
             size--;
             return oldFirst.value;
 
-        } else if (end.key.equals(key)) {
-            Node<K, V> oldEnd = end;
-            end = oldEnd.prev;
-            if (end != null && end.next != null) end.next = null;
+        } else if (last.key.equals(key)) {
+            Node<K, V> oldLast = last;
+            last = oldLast.prev;
+            if (last != null) last.next = null;
             size--;
-            return oldEnd.value;
+            return oldLast.value;
 
         } else {
             Node<K, V> prevPoint = point.prev;
@@ -115,62 +104,47 @@ public class LinkedMap<K, V> implements Map<K, V> {
     @Override
     public void clear() {
         first = null;
-        end = null;
+        last = null;
         size = 0;
     }
 
     @Override
     public Set<K> keySet() {
-        Node<K, V> point = first;
         Set<K> keySet = new HashSet<>(size);
-        while (point != null) {
+        for (Node<K, V> point = first; point != null; point = point.next)
             keySet.add(point.key);
-            point = point.next;
-        }
         return keySet;
     }
 
     @Override
     public List<V> values() {
-        Node<K, V> point = first;
         List<V> values = new ArrayList<>(size);
-        while (point != null) {
+        for (Node<K, V> point = first; point != null; point = point.next)
             values.add(point.value);
-            point = point.next;
-        }
         return values;
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        Node<K, V> point = first;
         Set<Entry<K, V>> entrySet = new HashSet<>(size);
-        while (point != null) {
+        for (Node<K, V> point = first; point != null; point = point.next)
             entrySet.add(new CustomEntry(point.key, point.value));
-            point = point.next;
-        }
         return entrySet;
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        Node<K, V> point = first;
-        while (point != null && point.next != null) {
-            result.append(point).append("; ");
-            point = point.next;
-        }
+        Node<K, V> point;
+        for (point = first; point != null && point.next != null; point = point.next)
+            result.append(point).append(", ");
         result.append(point);
-        if (result.toString().equals("null")) return "{}";
-        return "{" + result + "}";
+        return result.toString().equals("null") ? "{}" : "{" + result + "}";
     }
 
-    private Node<K, V> getNode(K key) {
-        Node<K, V> point = first;
-        while (point != null) {
+    private Node<K, V> getNode(Object key) {
+        for (Node<K, V> point = first; point != null; point = point.next)
             if (point.key.equals(key)) return point;
-            point = point.next;
-        }
         return null;
     }
 
