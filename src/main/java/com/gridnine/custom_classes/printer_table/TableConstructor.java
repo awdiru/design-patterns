@@ -1,6 +1,9 @@
 package com.gridnine.custom_classes.printer_table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -14,15 +17,19 @@ public class TableConstructor {
     static final String DEFAULT_HORIZONTAL_SEPARATOR = "_";
     static final int DEFAULT_WIDTH_COLUMN = 20;
     static final int DEFAULT_NUMBER_OF_HORIZONTAL_SEPARATORS = 1;
+    static final int DEFAULT_NUMBER_OF_VERTICAL_SEPARATORS = 1;
     static final boolean DEFAULT_WORDS_WRAPPING = false;
     static final boolean DEFAULT_STRING_WRAPPING = true;
+    static final boolean DEFAULT_ORIENTATION_VERTICAL_SEPARATOR = true;
     //конфиги
     private String verticalSeparator;
     private String horizontalSeparator;
     private int maxWidthColumn;
     private int numberOfHorizontalSeparators;
+    private int numberOfVerticalSeparators;
     private boolean wordsWrapping;
     private boolean stringWrapping;
+    private boolean orientationVerticalSeparator;
     //элементы сборки таблицы
     private List<Integer> columnWidths;
     private List<Integer> rowHeights;
@@ -32,9 +39,11 @@ public class TableConstructor {
         verticalSeparator = DEFAULT_VERTICAL_SEPARATOR;
         horizontalSeparator = DEFAULT_HORIZONTAL_SEPARATOR;
         maxWidthColumn = DEFAULT_WIDTH_COLUMN;
-        wordsWrapping = DEFAULT_WORDS_WRAPPING;
         numberOfHorizontalSeparators = DEFAULT_NUMBER_OF_HORIZONTAL_SEPARATORS;
+        numberOfVerticalSeparators = DEFAULT_NUMBER_OF_VERTICAL_SEPARATORS;
+        wordsWrapping = DEFAULT_WORDS_WRAPPING;
         stringWrapping = DEFAULT_STRING_WRAPPING;
+        orientationVerticalSeparator = DEFAULT_ORIENTATION_VERTICAL_SEPARATOR;
     }
 
     /**
@@ -70,7 +79,7 @@ public class TableConstructor {
         columnWidths = new ArrayList<>(numberOfColumns);
         IntStream.range(0, numberOfColumns).forEach(i -> columnWidths.add(0));
         rowHeights = new ArrayList<>(lines.length);
-        cells = new LinkedList<>();
+        cells = new ArrayList<>(numberOfColumns * lines.length);
 
         for (int row = 0; row < lines.length; row++) {
             rowHeights.add(1);
@@ -93,53 +102,67 @@ public class TableConstructor {
         for (int i = 0; i < numberOfHorizontalSeparators; i++)
             appendHeaderSeparator(builder);
 
+        int indexRow = 0;
         for (int row = 0; row < rowHeights.size(); row++) {
             for (int rowNum = 0; rowNum < rowHeights.get(row); rowNum++) {
+
+                String verSeparator = getVerticalSeparator(indexRow);
                 for (int col = 0; col < columnWidths.size(); col++) {
                     String str = cells.get(cells.indexOf(new Cell(row, col, null))).value.get(rowNum);
-                    builder.append(verticalSeparator)
+                    builder.append(verSeparator)
                             .append(str)
                             .append(" ".repeat(Integer.max(0, columnWidths.get(col) - str.length() + 1)));
                 }
-                builder.append(verticalSeparator).append("\n");
+                builder.append(verSeparator).append("\n");
+                indexRow++;
             }
             for (int i = 0; i < numberOfHorizontalSeparators; i++)
-                appendRowSeparator(builder);
+                appendRowSeparator(builder, indexRow++);
         }
         return builder.toString();
     }
 
     private void appendHeaderSeparator(StringBuilder builder) {
-        if (horizontalSeparator.length() == 1) {
-            builder.append(horizontalSeparator.repeat(verticalSeparator.length()));
-            for (Integer column : columnWidths)
-                builder.append(horizontalSeparator.repeat(column + verticalSeparator.length() + 1));
-            builder.append("\n");
+        int indexChar = 0;
+        int verticalSeparatorLength = getVerticalSeparator(0).length();
+        for (int i = 0; i < verticalSeparatorLength; i++)
+            builder.append(getHorizontalChar(indexChar++));
 
-        } else {
-            StringBuilder verSeparator = new StringBuilder();
-            while (verSeparator.length() < verticalSeparator.length()) {
-                int remaining = verticalSeparator.length() - verSeparator.length();
-                verSeparator.append(horizontalSeparator, 0, Integer.min(horizontalSeparator.length(), remaining));
-            }
-            builder.append(verSeparator);
-            StringBuilder horSeparator = new StringBuilder();
-            for(Integer column : columnWidths) {
-                while (horSeparator.length() < column) {
-                    int remaining = column - horSeparator.length();
-                    horSeparator.append(horizontalSeparator, 0, Integer.min(horizontalSeparator.length(), remaining));
-                }
-                builder.append(horSeparator).append(verSeparator);
-            }
-            builder.append("\n");
+        for (Integer col : columnWidths) {
+            for (int i = 0; i < col + 1; i++)
+                builder.append(getHorizontalChar(indexChar++));
+            for (int i = 0; i < verticalSeparatorLength; i++)
+                builder.append(getHorizontalChar(indexChar++));
         }
+        builder.append("\n");
     }
 
-    private void appendRowSeparator(StringBuilder builder) {
-        builder.append(verticalSeparator);
-        for (Integer column : columnWidths)
-            builder.append(horizontalSeparator.repeat(column + 1)).append(verticalSeparator);
+    private void appendRowSeparator(StringBuilder builder, int indexRow) {
+        int indexChar = 0;
+        String vertSeparator = getVerticalSeparator(indexRow);
+        builder.append(vertSeparator);
+        for (Integer col : columnWidths) {
+            for (int i = 0; i < col + 1; i++)
+                builder.append(getHorizontalChar(indexChar++));
+            builder.append(vertSeparator);
+        }
         builder.append("\n");
+    }
+
+    private String getHorizontalChar(int index) {
+        int indexStr = index % horizontalSeparator.length();
+        return horizontalSeparator.substring(indexStr, indexStr + 1);
+    }
+
+    private String getVerticalSeparator(int index) {
+        if (!orientationVerticalSeparator)
+            return verticalSeparator.repeat(numberOfVerticalSeparators);
+        else return getVerticalChar(index).repeat(numberOfVerticalSeparators);
+    }
+
+    private String getVerticalChar(int index) {
+        int indexStr = index % verticalSeparator.length();
+        return verticalSeparator.substring(indexStr, indexStr + 1);
     }
 
 
@@ -230,8 +253,16 @@ public class TableConstructor {
         this.numberOfHorizontalSeparators = numberOfHorizontalSeparators;
     }
 
+    public void setNumberOfVerticalSeparators(int numberOfVerticalSeparators) {
+        this.numberOfVerticalSeparators = numberOfVerticalSeparators;
+    }
+
     public void setStringWrapping(boolean stringWrapping) {
         this.stringWrapping = stringWrapping;
+    }
+
+    public void setOrientationVerticalSeparator(boolean verticalOrientationVerticalSeparator) {
+        this.orientationVerticalSeparator = verticalOrientationVerticalSeparator;
     }
 
     private static class Cell {

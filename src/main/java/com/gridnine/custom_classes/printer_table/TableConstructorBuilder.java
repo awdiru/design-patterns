@@ -15,7 +15,7 @@ public class TableConstructorBuilder {
      * По умолчанию: "|"
      *
      * @param verticalSeparator вертикальный разделитель
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setVerticalSeparator(String verticalSeparator) {
         if (verticalSeparator == null || verticalSeparator.isEmpty())
@@ -30,15 +30,12 @@ public class TableConstructorBuilder {
      * По умолчанию: "_"
      *
      * @param horizontalSeparator горизонтальный разделитель
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setHorizontalSeparator(String horizontalSeparator) {
         if (horizontalSeparator == null || horizontalSeparator.isEmpty())
             horizontalSeparator = TableConstructor.DEFAULT_HORIZONTAL_SEPARATOR;
-/*
-        if (horizontalSeparator.length() > 1)
-            horizontalSeparator = horizontalSeparator.substring(0, 1);
-*/
+
         tableConstructor.setHorizontalSeparator(horizontalSeparator);
         return this;
     }
@@ -47,7 +44,7 @@ public class TableConstructorBuilder {
      * Установить количество горизонтальных разделителей между строками таблицы
      *
      * @param numberOfHorizontalSeparators количество горизонтальных разделителей
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setNumberOfHorizontalSeparators(int numberOfHorizontalSeparators) {
         if (numberOfHorizontalSeparators < 1)
@@ -56,12 +53,18 @@ public class TableConstructorBuilder {
         return this;
     }
 
+    public TableConstructorBuilder setNumberOfVerticalSeparators(int numberOfVerticalSeparators) {
+        if (numberOfVerticalSeparators < 1)
+            numberOfVerticalSeparators = TableConstructor.DEFAULT_NUMBER_OF_VERTICAL_SEPARATORS;
+        tableConstructor.setNumberOfVerticalSeparators(numberOfVerticalSeparators);
+        return this;
+    }
     /**
      * Установить максимальную ширину столбца.
      * По умолчанию: "20"
      *
      * @param maxWidthColumn максимальная ширина столбца
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setMaxWidthColumn(int maxWidthColumn) {
         if (maxWidthColumn < 1)
@@ -76,7 +79,7 @@ public class TableConstructorBuilder {
      * По умолчанию: "false"
      *
      * @param wordsWrapping переносить слова (да/нет)
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setWordsWrapping(boolean wordsWrapping) {
         tableConstructor.setWordsWrapping(wordsWrapping);
@@ -91,7 +94,7 @@ public class TableConstructorBuilder {
      * конечный вид таблицы
      *
      * @param stringWrapping перенос строк
-     * @return PrinterTableBuilder
+     * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setStringWrapping(boolean stringWrapping) {
         tableConstructor.setStringWrapping(stringWrapping);
@@ -99,9 +102,24 @@ public class TableConstructorBuilder {
     }
 
     /**
+     * Установить ориентацию вертикального разделителя. По умолчанию - "true".
+     * Если значение false - заданный вертикальный разделитель
+     * будет весь написан на одной строке между ячейками таблицы.
+     * Если значение true - заданный вертикальный разделитель
+     * будет посимвольно написан вдоль вертикальной линии, разделяющей столбцы
+     *
+     * @param orientationVerticalSeparator ориентация вертикального разделителя
+     * @return {@link TableConstructorBuilder}
+     */
+    public TableConstructorBuilder setOrientationVerticalSeparator(boolean orientationVerticalSeparator) {
+        tableConstructor.setOrientationVerticalSeparator(orientationVerticalSeparator);
+        return this;
+    }
+
+    /**
      * Собрать PrinterTable
      *
-     * @return PrinterTable
+     * @return {@link TableConstructor}
      */
     public TableConstructor build() {
         return tableConstructor;

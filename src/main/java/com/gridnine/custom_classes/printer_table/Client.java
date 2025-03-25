@@ -11,12 +11,14 @@ public class Client {
 
         TableConstructorBuilder builder = new TableConstructorBuilder();
         TableConstructor tableConstructor = builder
-                .setHorizontalSeparator("1 2 3")
-                .setVerticalSeparator("|")
-                .setMaxWidthColumn(15)
+                .setHorizontalSeparator("<<>>")
+                .setVerticalSeparator("||||")
+                .setMaxWidthColumn(10)
                 .setNumberOfHorizontalSeparators(1)
-                .setWordsWrapping(false)
+                .setNumberOfVerticalSeparators(1)
+                .setWordsWrapping(true)
                 .setStringWrapping(true)
+                .setOrientationVerticalSeparator(true)
                 .build();
 
         String table = tableConstructor.getTable(List.of(header, line1, line2));
