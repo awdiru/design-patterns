@@ -1,7 +1,6 @@
 package com.gridnine.custom_classes.printer_table;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
