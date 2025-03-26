@@ -1,4 +1,6 @@
-package com.gridnine.custom_classes.printer_table;
+package com.gridnine.custom_classes.table.constructor;
+
+import java.util.List;
 
 /**
  * Конструктор класса PrinterTable
@@ -18,9 +20,6 @@ public class TableConstructorBuilder {
      * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setVerticalSeparator(String verticalSeparator) {
-        if (verticalSeparator == null || verticalSeparator.isEmpty())
-            verticalSeparator = TableConstructor.DEFAULT_VERTICAL_SEPARATOR;
-
         tableConstructor.setVerticalSeparator(verticalSeparator);
         return this;
     }
@@ -33,9 +32,6 @@ public class TableConstructorBuilder {
      * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setHorizontalSeparator(String horizontalSeparator) {
-        if (horizontalSeparator == null || horizontalSeparator.isEmpty())
-            horizontalSeparator = TableConstructor.DEFAULT_HORIZONTAL_SEPARATOR;
-
         tableConstructor.setHorizontalSeparator(horizontalSeparator);
         return this;
     }
@@ -47,18 +43,15 @@ public class TableConstructorBuilder {
      * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setNumberOfHorizontalSeparators(int numberOfHorizontalSeparators) {
-        if (numberOfHorizontalSeparators < 1)
-            numberOfHorizontalSeparators = TableConstructor.DEFAULT_NUMBER_OF_HORIZONTAL_SEPARATORS;
         tableConstructor.setNumberOfHorizontalSeparators(numberOfHorizontalSeparators);
         return this;
     }
 
     public TableConstructorBuilder setNumberOfVerticalSeparators(int numberOfVerticalSeparators) {
-        if (numberOfVerticalSeparators < 1)
-            numberOfVerticalSeparators = TableConstructor.DEFAULT_NUMBER_OF_VERTICAL_SEPARATORS;
         tableConstructor.setNumberOfVerticalSeparators(numberOfVerticalSeparators);
         return this;
     }
+
     /**
      * Установить максимальную ширину столбца.
      * По умолчанию: "20"
@@ -67,9 +60,6 @@ public class TableConstructorBuilder {
      * @return {@link TableConstructorBuilder}
      */
     public TableConstructorBuilder setMaxWidthColumn(int maxWidthColumn) {
-        if (maxWidthColumn < 1)
-            maxWidthColumn = TableConstructor.DEFAULT_WIDTH_COLUMN;
-
         tableConstructor.setMaxWidthColumn(maxWidthColumn);
         return this;
     }
@@ -89,15 +79,15 @@ public class TableConstructorBuilder {
     /**
      * Установить перенос слов на новую строку с учетом
      * максимальной ширины столбца. По умолчанию true.
-     * Если значение false - максимальная ширина столбца ({@link #setMaxWidthColumn(int)})
-     * и перенос слов ({@link #setWordsWrapping(boolean)}) не влияют на
+     * Если значение false - максимальная ширина столбца {@link #setMaxWidthColumn(int)}
+     * и перенос слов {@link #setWordsWrapping(boolean)} не влияют на
      * конечный вид таблицы
      *
-     * @param stringWrapping перенос строк
+     * @param cellValueWrapping перенос строк
      * @return {@link TableConstructorBuilder}
      */
-    public TableConstructorBuilder setStringWrapping(boolean stringWrapping) {
-        tableConstructor.setStringWrapping(stringWrapping);
+    public TableConstructorBuilder setCellValueWrapping(boolean cellValueWrapping) {
+        tableConstructor.setCellValueWrapping(cellValueWrapping);
         return this;
     }
 
@@ -113,6 +103,43 @@ public class TableConstructorBuilder {
      */
     public TableConstructorBuilder setOrientationVerticalSeparator(boolean orientationVerticalSeparator) {
         tableConstructor.setOrientationVerticalSeparator(orientationVerticalSeparator);
+        return this;
+    }
+
+    /**
+     * Установить ориентацию горизонтального разделителя. По умолчанию - "true".
+     * Если значение true - заданный горизонтальный разделитель
+     * будет весь написан на одной строке.
+     * Если значение false - заданный горизонтальный разделитель
+     * будет посимвольно написан вдоль вертикальной линии.
+     *
+     * @param orientationHorizontalSeparator ориентация вертикального разделителя
+     * @return {@link TableConstructorBuilder}
+     */
+    public TableConstructorBuilder setOrientationHorizontalSeparator(boolean orientationHorizontalSeparator) {
+        tableConstructor.setOrientationHorizontalSeparator(orientationHorizontalSeparator);
+        return this;
+    }
+
+    /**
+     * Установить выравнивание ячеек
+     *
+     * @param alignment список {@link Alignment} значений для выравнивания ячеек
+     * @return {@link TableConstructorBuilder}
+     */
+    public TableConstructorBuilder setAlignment(List<Alignment> alignment) {
+        tableConstructor.setAlignment(alignment);
+        return this;
+    }
+
+    /**
+     * Установить выравнивание ячеек
+     *
+     * @param alignment массив {@link Alignment} значений для выравнивания ячеек
+     * @return {@link TableConstructorBuilder}
+     */
+    public TableConstructorBuilder setAlignment(Alignment... alignment) {
+        tableConstructor.setAlignment(alignment);
         return this;
     }
 
