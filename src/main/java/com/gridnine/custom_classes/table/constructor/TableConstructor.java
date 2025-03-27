@@ -1,8 +1,6 @@
 package com.gridnine.custom_classes.table.constructor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.*;
@@ -24,12 +22,13 @@ public class TableConstructor {
     private boolean cellValueWrapping = DEFAULT_CELL_VALUE_WRAPPING;
     private boolean orientationVerticalSeparator = DEFAULT_ORIENTATION_VERTICAL_SEPARATOR;
     private boolean orientationHorizontalSeparator = DEFAULT_ORIENTATION_HORIZONTAL_SEPARATOR;
+    private boolean celleCompression = DEFAULT_CELLE_COMPRESSION;
     private List<TableConstructorAlignment> alignment = DEFAULT_ALIGNMENT;
 
     // элементы таблицы
     private List<Integer> columnWidths;
     private List<Integer> rowHeights;
-    private List<Cell> cells;
+    private Map<Cell, List<String>> cells;
 
     /**
      * Создает таблицу из строк.
@@ -72,7 +71,7 @@ public class TableConstructor {
             for (int col = 0; col < numberOfColumns; col++)
                 initCell(row, col, getCellValue(formattedRow.get(col)));
         }
-        cells.forEach(this::optimizeCellValue);
+        cells.keySet().forEach(this::optimizeCellValue);
     }
 
     private String buildTable() {
@@ -80,18 +79,17 @@ public class TableConstructor {
         for (int i = 0; i < numberOfHorizontalSeparators; i++)
             appendHeaderSeparator(builder);
 
-        int indexRow = 0;
+        int rowNum = 0;
         for (int row = 0; row < rowHeights.size(); row++) {
-            for (int rowNum = 0; rowNum < rowHeights.get(row); rowNum++) {
+            for (int indexRow = 0; indexRow < rowHeights.get(row); indexRow++) {
                 for (int col = 0; col < columnWidths.size(); col++) {
-                    String segmentCellValue = cells.get(cells.indexOf(new Cell(row, col, null))).value.get(rowNum);
-                    buildSegmentCell(builder, getVerticalSeparator(indexRow, col), segmentCellValue, col, row);
+                    String segmentCellValue = cells.get(new Cell(row, col)).get(indexRow);
+                    buildSegmentCell(builder, getVerticalSeparator(rowNum, col), segmentCellValue, col, row);
                 }
-                builder.append(getVerticalSeparator(indexRow, columnWidths.size())).append("\n");
-                indexRow++;
+                builder.append(getVerticalSeparator(rowNum++, columnWidths.size())).append("\n");
             }
             for (int i = 0; i < numberOfHorizontalSeparators; i++)
-                appendRowSeparator(builder, indexRow++, row + 1);
+                appendRowSeparator(builder, rowNum++, row + 1);
         }
         return builder.toString();
     }
@@ -99,9 +97,11 @@ public class TableConstructor {
     private void initTableParam(int numberOfColumns, int numberOfRows) {
         columnWidths = new ArrayList<>(numberOfColumns);
         rowHeights = new ArrayList<>(numberOfRows);
-        cells = new ArrayList<>(numberOfColumns * numberOfRows);
+        cells = new HashMap<>(numberOfColumns * numberOfRows);
+        if (!celleCompression)
+            IntStream.range(0, numberOfColumns).forEach(i -> columnWidths.add(maxWidthColumn));
+        else IntStream.range(0, numberOfColumns).forEach(i -> columnWidths.add(0));
 
-        IntStream.range(0, numberOfColumns).forEach(i -> columnWidths.add(0));
         IntStream.range(0, numberOfRows).forEach(o -> rowHeights.add(0));
     }
 
@@ -112,10 +112,10 @@ public class TableConstructor {
     }
 
     private void initCell(int row, int col, List<String> cellValue) {
-        Cell cell = new Cell(row, col, cellValue);
-        columnWidths.set(col, Integer.max(columnWidths.get(col), getMaxStringLength(cell.value)));
-        rowHeights.set(row, Integer.max(rowHeights.get(row), cell.value.size()));
-        cells.add(cell);
+        Cell cell = new Cell(row, col);
+        columnWidths.set(col, Integer.max(columnWidths.get(col), getMaxStringLength(cellValue)));
+        rowHeights.set(row, Integer.max(rowHeights.get(row), cellValue.size()));
+        cells.put(cell, cellValue);
     }
 
     private void buildSegmentCell(StringBuilder builder, String verSeparator, String segmentCellValue, int colWidth, int rowNum) {
@@ -192,15 +192,15 @@ public class TableConstructor {
         return String.valueOf(horizontalSeparator[indexStr]);
     }
 
-    private String getVerticalSeparator(int index, int col) {
+    private String getVerticalSeparator(int rowNum, int col) {
         if (!orientationVerticalSeparator)
             return getVerticalChar(col).repeat(numberOfVerticalSeparators);
-        else return getVerticalChar(index).repeat(numberOfVerticalSeparators);
+        else return getVerticalChar(rowNum).repeat(numberOfVerticalSeparators);
     }
 
-    private String getVerticalChar(int index) {
+    private String getVerticalChar(int rowNum) {
         if (verticalSeparator.length == 0) return "";
-        int indexStr = index % verticalSeparator.length;
+        int indexStr = rowNum % verticalSeparator.length;
         return String.valueOf(verticalSeparator[indexStr]);
     }
 
@@ -242,7 +242,7 @@ public class TableConstructor {
     }
 
     private void optimizeCellValue(Cell cell) {
-        List<String> cellValue = cell.value;
+        List<String> cellValue = cells.get(cell);
         if (!wordsWrapping && cellValueWrapping) {
             for (int rowNum = 0; rowNum < cellValue.size() - 1; rowNum++) {
                 if ((cellValue.get(rowNum) + cellValue.get(rowNum + 1)).length() <= columnWidths.get(cell.columnNum)) {
@@ -296,15 +296,6 @@ public class TableConstructor {
     }
 
     /**
-     * Установить возможность переноса слов на новую строку при достижении максимальной ширины столбца
-     *
-     * @param wordsWrapping возможность переноса слов
-     */
-    public void setWordsWrapping(boolean wordsWrapping) {
-        this.wordsWrapping = wordsWrapping;
-    }
-
-    /**
      * Установить количество горизонтальных разделителей между строками
      *
      * @param numberOfHorizontalSeparators количество горизонтальных разделителей
@@ -322,6 +313,15 @@ public class TableConstructor {
     public void setNumberOfVerticalSeparators(int numberOfVerticalSeparators) {
         if (numberOfVerticalSeparators < 1) return;
         this.numberOfVerticalSeparators = numberOfVerticalSeparators;
+    }
+
+    /**
+     * Установить возможность переноса слов на новую строку при достижении максимальной ширины столбца
+     *
+     * @param wordsWrapping возможность переноса слов
+     */
+    public void setWordsWrapping(boolean wordsWrapping) {
+        this.wordsWrapping = wordsWrapping;
     }
 
     /**
@@ -356,6 +356,17 @@ public class TableConstructor {
     }
 
     /**
+     * Установить сжатие ширины ячеек по размеру максимального слова в столбце.
+     * true - сжатие включено,
+     * false - сжатие выключено
+     *
+     * @param celleCompression сжатие ячеек
+     */
+    public void setCelleCompression(boolean celleCompression) {
+        this.celleCompression = celleCompression;
+    }
+
+    /**
      * Установить выравнивание ячеек
      *
      * @param alignment список {@link TableConstructorAlignment} значений для выравнивания ячеек
@@ -375,22 +386,13 @@ public class TableConstructor {
         setAlignment(alignmentList);
     }
 
-    private class Cell {
+    private static class Cell {
         int lineNum;
         int columnNum;
-        List<String> value;
 
-        public Cell(int lineNum, int columnNum, List<String> value) {
+        public Cell(int lineNum, int columnNum) {
             this.lineNum = lineNum;
             this.columnNum = columnNum;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            for (String s : value) builder.append(s).append("\n");
-            return builder.toString();
         }
 
         @Override

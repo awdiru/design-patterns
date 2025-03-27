@@ -122,6 +122,19 @@ public class TableConstructorBuilder {
     }
 
     /**
+     * Установить сжатие ширины ячеек по размеру максимального слова в столбце. По умолчанию - "true".
+     * Если значение true - ячейки сжимаются по размеру максимального слова в столбце.
+     * Если значение false - ячейки остаются размера maxWidthColumns или больше
+     *
+     * @param celleCompression сжатие ячеек столбца
+     * @return {@link TableConstructorBuilder}
+     */
+    public TableConstructorBuilder setCelleCompression(boolean celleCompression) {
+        tableConstructor.setCelleCompression(celleCompression);
+        return this;
+    }
+
+    /**
      * Установить выравнивание ячеек
      *
      * @param alignment список {@link TableConstructorAlignment} значений для выравнивания ячеек
