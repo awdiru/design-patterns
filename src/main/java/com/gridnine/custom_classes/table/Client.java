@@ -5,7 +5,7 @@ import com.gridnine.custom_classes.table.constructor.TableConstructorBuilder;
 
 import java.util.List;
 
-import static com.gridnine.custom_classes.table.constructor.Alignment.*;
+import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.*;
 
 public class Client {
 
@@ -25,7 +25,7 @@ public class Client {
 
         TableConstructorBuilder builder = new TableConstructorBuilder();
         TableConstructor tableConstructor = builder
-                .setHorizontalSeparator("_")
+                .setHorizontalSeparator("")
                 .setVerticalSeparator("")
                 .setMaxWidthColumn(20)
                 .setNumberOfHorizontalSeparators(1)

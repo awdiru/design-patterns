@@ -2,17 +2,17 @@ package com.gridnine.custom_classes.table.constructor;
 
 import java.util.List;
 
-import static com.gridnine.custom_classes.table.constructor.Alignment.ALL_LEFT_ALIGNMENT;
+import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.ALL_LEFT_ALIGNMENT;
 
-public class Constants {
+public class TableConstructorConstants {
     /**
      * Вертикальный разделитель по умолчанию
      */
-    public static final byte[] DEFAULT_VERTICAL_SEPARATOR = {124};
+    public static final char[] DEFAULT_VERTICAL_SEPARATOR = {'|'};
     /**
      * Горизонтальный разделитель по умолчанию
      */
-    public static final byte[] DEFAULT_HORIZONTAL_SEPARATOR = {95};
+    public static final char[] DEFAULT_HORIZONTAL_SEPARATOR = {'_'};
     /**
      * Максимальная ширина столбца по умолчанию
      */
@@ -44,5 +44,5 @@ public class Constants {
     /**
      * Выравнивание по умолчанию
      */
-    public static final List<Alignment> DEFAULT_ALIGNMENT = List.of(ALL_LEFT_ALIGNMENT);
+    public static final List<TableConstructorAlignment> DEFAULT_ALIGNMENT = List.of(ALL_LEFT_ALIGNMENT);
 }

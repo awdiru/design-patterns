@@ -124,10 +124,10 @@ public class TableConstructorBuilder {
     /**
      * Установить выравнивание ячеек
      *
-     * @param alignment список {@link Alignment} значений для выравнивания ячеек
+     * @param alignment список {@link TableConstructorAlignment} значений для выравнивания ячеек
      * @return {@link TableConstructorBuilder}
      */
-    public TableConstructorBuilder setAlignment(List<Alignment> alignment) {
+    public TableConstructorBuilder setAlignment(List<TableConstructorAlignment> alignment) {
         tableConstructor.setAlignment(alignment);
         return this;
     }
@@ -135,10 +135,10 @@ public class TableConstructorBuilder {
     /**
      * Установить выравнивание ячеек
      *
-     * @param alignment массив {@link Alignment} значений для выравнивания ячеек
+     * @param alignment массив {@link TableConstructorAlignment} значений для выравнивания ячеек
      * @return {@link TableConstructorBuilder}
      */
-    public TableConstructorBuilder setAlignment(Alignment... alignment) {
+    public TableConstructorBuilder setAlignment(TableConstructorAlignment... alignment) {
         tableConstructor.setAlignment(alignment);
         return this;
     }

@@ -1,6 +1,6 @@
 package com.gridnine.custom_classes.table.constructor;
 
-public enum Alignment {
+public enum TableConstructorAlignment {
     /**
      * Шапка выравнена по центру.
      * Имеет приоритет над выравниванием по правому и левому краю

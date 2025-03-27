@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static com.gridnine.custom_classes.table.constructor.Alignment.*;
-import static com.gridnine.custom_classes.table.constructor.Constants.*;
+import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.*;
+import static com.gridnine.custom_classes.table.constructor.TableConstructorConstants.*;
 
 /**
  * Класс для создания таблиц.
@@ -15,8 +15,8 @@ import static com.gridnine.custom_classes.table.constructor.Constants.*;
  */
 public class TableConstructor {
     // конфиги
-    private byte[] verticalSeparator = DEFAULT_VERTICAL_SEPARATOR;
-    private byte[] horizontalSeparator = DEFAULT_HORIZONTAL_SEPARATOR;
+    private char[] verticalSeparator = DEFAULT_VERTICAL_SEPARATOR;
+    private char[] horizontalSeparator = DEFAULT_HORIZONTAL_SEPARATOR;
     private int maxWidthColumn = DEFAULT_WIDTH_COLUMN;
     private int numberOfHorizontalSeparators = DEFAULT_NUMBER_OF_HORIZONTAL_SEPARATORS;
     private int numberOfVerticalSeparators = DEFAULT_NUMBER_OF_VERTICAL_SEPARATORS;
@@ -24,7 +24,7 @@ public class TableConstructor {
     private boolean cellValueWrapping = DEFAULT_CELL_VALUE_WRAPPING;
     private boolean orientationVerticalSeparator = DEFAULT_ORIENTATION_VERTICAL_SEPARATOR;
     private boolean orientationHorizontalSeparator = DEFAULT_ORIENTATION_HORIZONTAL_SEPARATOR;
-    private List<Alignment> alignment = DEFAULT_ALIGNMENT;
+    private List<TableConstructorAlignment> alignment = DEFAULT_ALIGNMENT;
 
     // элементы таблицы
     private List<Integer> columnWidths;
@@ -65,13 +65,12 @@ public class TableConstructor {
     private void initTable(List<?>... lines) {
         final int numberOfColumns = lines[0].size();
         final int numberOfRows = lines.length;
-        ;
         initTableParam(numberOfColumns, numberOfRows);
 
         for (int row = 0; row < numberOfRows; row++) {
             List<String> formattedRow = formatRow(lines[row], numberOfColumns);
             for (int col = 0; col < numberOfColumns; col++)
-                buildCell(row, col, getCellValue(formattedRow.get(col)));
+                initCell(row, col, getCellValue(formattedRow.get(col)));
         }
         cells.forEach(this::optimizeCellValue);
     }
@@ -85,8 +84,8 @@ public class TableConstructor {
         for (int row = 0; row < rowHeights.size(); row++) {
             for (int rowNum = 0; rowNum < rowHeights.get(row); rowNum++) {
                 for (int col = 0; col < columnWidths.size(); col++) {
-                    String str = cells.get(cells.indexOf(new Cell(row, col, null))).value.get(rowNum);
-                    buildCell(builder, getVerticalSeparator(indexRow, col), str, col, alignment, row);
+                    String segmentCellValue = cells.get(cells.indexOf(new Cell(row, col, null))).value.get(rowNum);
+                    buildSegmentCell(builder, getVerticalSeparator(indexRow, col), segmentCellValue, col, row);
                 }
                 builder.append(getVerticalSeparator(indexRow, columnWidths.size())).append("\n");
                 indexRow++;
@@ -106,34 +105,34 @@ public class TableConstructor {
         IntStream.range(0, numberOfRows).forEach(o -> rowHeights.add(0));
     }
 
-    private List<String> formatRow(List<?> row, int targetColumns) {
-        List<String> formattedRow = new ArrayList<>(targetColumns);
+    private List<String> formatRow(List<?> row, int numberOfColumns) {
+        List<String> formattedRow = new ArrayList<>(numberOfColumns);
         row.forEach(item -> formattedRow.add(item.toString()));
         return formattedRow;
     }
 
-    private void buildCell(int row, int col, List<String> cellValue) {
+    private void initCell(int row, int col, List<String> cellValue) {
         Cell cell = new Cell(row, col, cellValue);
         columnWidths.set(col, Integer.max(columnWidths.get(col), getMaxStringLength(cell.value)));
         rowHeights.set(row, Integer.max(rowHeights.get(row), cell.value.size()));
         cells.add(cell);
     }
 
-    private void buildCell(StringBuilder builder, String verSeparator, String str, int colWidth, List<Alignment> alignment, int rowNum) {
+    private void buildSegmentCell(StringBuilder builder, String verSeparator, String segmentCellValue, int colWidth, int rowNum) {
         if ((alignment.contains(HEADER_CENTER_ALIGNMENT) && rowNum == 0)
                 || (alignment.contains(BODY_CENTER_ALIGNMENT) && rowNum != 0))
-            buildCellCenterAlignment(builder, verSeparator, str, colWidth);
+            buildSegmentCellCenterAlignment(builder, verSeparator, segmentCellValue, colWidth);
 
         else if ((alignment.contains(HEADER_RIGHT_ALIGNMENT) && rowNum == 0)
                 || (alignment.contains(BODY_RIGHT_ALIGNMENT) && rowNum != 0)) {
-            buildCellRightAlignment(builder, verSeparator, str, colWidth);
+            buildSegmentCellRightAlignment(builder, verSeparator, segmentCellValue, colWidth);
 
         } else {
-            buildCellLeftAlignment(builder, verSeparator, str, colWidth);
+            buildSegmentCellLeftAlignment(builder, verSeparator, segmentCellValue, colWidth);
         }
     }
 
-    private void buildCellCenterAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
+    private void buildSegmentCellCenterAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
         int shift = Integer.max(0, (columnWidths.get(colWidth) - str.length() + 1) / 2);
         builder.append(verSeparator)
                 .append(" ".repeat(shift))
@@ -141,14 +140,14 @@ public class TableConstructor {
                 .append(" ".repeat(Integer.max(0, (columnWidths.get(colWidth) - str.length() + 1) - shift)));
     }
 
-    private void buildCellRightAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
+    private void buildSegmentCellRightAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
         builder.append(verSeparator)
                 .append(" ".repeat(Integer.max(0, columnWidths.get(colWidth) - str.length())))
                 .append(str)
                 .append(" ");
     }
 
-    private void buildCellLeftAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
+    private void buildSegmentCellLeftAlignment(StringBuilder builder, String verSeparator, String str, int colWidth) {
         builder.append(verSeparator)
                 .append(str)
                 .append(" ".repeat(Integer.max(0, columnWidths.get(colWidth) - str.length() + 1)));
@@ -188,8 +187,9 @@ public class TableConstructor {
     }
 
     private String getHorizontalChar(int index) {
+        if (horizontalSeparator.length == 0) return "";
         int indexStr = index % horizontalSeparator.length;
-        return String.valueOf((char) horizontalSeparator[indexStr]);
+        return String.valueOf(horizontalSeparator[indexStr]);
     }
 
     private String getVerticalSeparator(int index, int col) {
@@ -201,7 +201,7 @@ public class TableConstructor {
     private String getVerticalChar(int index) {
         if (verticalSeparator.length == 0) return "";
         int indexStr = index % verticalSeparator.length;
-        return String.valueOf((char) verticalSeparator[indexStr]);
+        return String.valueOf(verticalSeparator[indexStr]);
     }
 
     private List<String> getCellValue(String value) {
@@ -268,7 +268,9 @@ public class TableConstructor {
      */
     public void setVerticalSeparator(String verticalSeparator) {
         if (verticalSeparator == null) return;
-        this.verticalSeparator = verticalSeparator.getBytes();
+        this.verticalSeparator = new char[verticalSeparator.length()];
+        for (int i = 0; i < verticalSeparator.length(); i++)
+            this.verticalSeparator[i] = verticalSeparator.charAt(i);
     }
 
     /**
@@ -278,8 +280,9 @@ public class TableConstructor {
      */
     public void setHorizontalSeparator(String horizontalSeparator) {
         if (horizontalSeparator == null) return;
-        if (horizontalSeparator.isEmpty()) this.horizontalSeparator = new byte[]{32};
-        else this.horizontalSeparator = horizontalSeparator.getBytes();
+        this.horizontalSeparator = new char[horizontalSeparator.length()];
+        for (int i = 0; i < horizontalSeparator.length(); i++)
+            this.horizontalSeparator[i] = horizontalSeparator.charAt(i);
     }
 
     /**
@@ -355,9 +358,9 @@ public class TableConstructor {
     /**
      * Установить выравнивание ячеек
      *
-     * @param alignment список {@link Alignment} значений для выравнивания ячеек
+     * @param alignment список {@link TableConstructorAlignment} значений для выравнивания ячеек
      */
-    public void setAlignment(List<Alignment> alignment) {
+    public void setAlignment(List<TableConstructorAlignment> alignment) {
         if (alignment.isEmpty()) return;
         this.alignment = alignment;
     }
@@ -365,10 +368,10 @@ public class TableConstructor {
     /**
      * Установить выравнивание ячеек
      *
-     * @param alignment массив {@link Alignment} значений для выравнивания ячеек
+     * @param alignment массив {@link TableConstructorAlignment} значений для выравнивания ячеек
      */
-    public void setAlignment(Alignment... alignment) {
-        List<Alignment> alignmentList = List.of(alignment);
+    public void setAlignment(TableConstructorAlignment... alignment) {
+        List<TableConstructorAlignment> alignmentList = List.of(alignment);
         setAlignment(alignmentList);
     }
 
