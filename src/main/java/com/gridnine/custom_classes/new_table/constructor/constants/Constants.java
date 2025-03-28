@@ -1,18 +1,21 @@
-package com.gridnine.custom_classes.table.constructor;
+package com.gridnine.custom_classes.new_table.constructor.constants;
 
-import java.util.List;
+import com.gridnine.custom_classes.table.constructor.alignment.Alignment;
+import com.gridnine.custom_classes.table.constructor.constants.Color;
+import com.gridnine.custom_classes.table.constructor.model.Cell;
 
-import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.ALL_LEFT_ALIGNMENT;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TableConstructorConstants {
+public class Constants {
     /**
      * Вертикальный разделитель по умолчанию
      */
-    public static final char[] DEFAULT_VERTICAL_SEPARATOR = {'|'};
+    public static final String DEFAULT_VERTICAL_SEPARATOR = "|";
     /**
      * Горизонтальный разделитель по умолчанию
      */
-    public static final char[] DEFAULT_HORIZONTAL_SEPARATOR = {'_'};
+    public static final String DEFAULT_HORIZONTAL_SEPARATOR = "_";
     /**
      * Максимальная ширина столбца по умолчанию
      */
@@ -32,7 +35,7 @@ public class TableConstructorConstants {
     /**
      * Перенос значения ячейки на новую строку при достижении максимального размера столбца по умолчанию
      */
-    public static final boolean DEFAULT_CELL_VALUE_WRAPPING = true;
+    public static final boolean DEFAULT_CONTENT_WRAPPING = true;
     /**
      * Ориентация вертикального разделителя по умолчанию
      */
@@ -41,13 +44,20 @@ public class TableConstructorConstants {
      * Ориентация горизонтального разделителя по умолчанию
      */
     public static final boolean DEFAULT_ORIENTATION_HORIZONTAL_SEPARATOR = true;
-
     /**
      * Сжатие ширины ячеек по размеру максимального слова в столбце.
      */
-    public static final boolean DEFAULT_CELLE_COMPRESSION = false;
+    public static final boolean DEFAULT_CELLE_COMPRESSION = true;
     /**
      * Выравнивание по умолчанию
      */
-    public static final List<TableConstructorAlignment> DEFAULT_ALIGNMENT = List.of(ALL_LEFT_ALIGNMENT);
+    public static final Map<Cell, Alignment> DEFAULT_ALIGNMENT = new HashMap<>();
+    /**
+     * Цвет текста по умолчанию
+     */
+    public static final Map<Cell, com.gridnine.custom_classes.table.constructor.constants.Color> DEFAULT_TEXT_COLOR = new HashMap<>();
+    /**
+     * Цвет фона ячеек по умолчанию
+     */
+    public static final Map<Cell, Color> DEFAULT_BG_COLOR = new HashMap<>();
 }

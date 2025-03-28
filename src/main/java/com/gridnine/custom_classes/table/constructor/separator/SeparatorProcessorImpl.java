@@ -1,12 +1,11 @@
-package com.gridnine.custom_classes.table_new.constructor.separator;
+package com.gridnine.custom_classes.table.constructor.separator;
 
-import com.gridnine.custom_classes.table_new.constructor.TableConstructorConfig;
+import com.gridnine.custom_classes.table.constructor.TableConstructorConfig;
 
 
 public class SeparatorProcessorImpl implements SeparatorProcessor {
     private final char[] horizontalSeparator;
     private final char[] verticalSeparator;
-    private final int numberOfHorizontalSeparators;
     private final int numberOfVerticalSeparators;
     private final boolean orientationVerticalSeparator;
     private final boolean orientationHorizontalSeparator;
@@ -14,7 +13,6 @@ public class SeparatorProcessorImpl implements SeparatorProcessor {
     public SeparatorProcessorImpl(TableConstructorConfig config) {
         this.orientationVerticalSeparator = config.isOrientationVerticalSeparator();
         this.orientationHorizontalSeparator = config.isOrientationHorizontalSeparator();
-        this.numberOfHorizontalSeparators = config.getNumberOfHorizontalSeparators();
         this.numberOfVerticalSeparators = config.getNumberOfVerticalSeparators();
 
         String separator = config.getHorizontalSeparator();
@@ -29,28 +27,26 @@ public class SeparatorProcessorImpl implements SeparatorProcessor {
     }
 
     @Override
-    public String getSeparator(int index, int row, boolean isHorizontal) {
-        if (isHorizontal) return getHorizontalSeparator(index, row).repeat(numberOfHorizontalSeparators);
-        return getVerticalSeparator(index, row).repeat(numberOfVerticalSeparators);
-    }
-
-    private String getHorizontalSeparator(int index, int row) {
-        if (orientationHorizontalSeparator) return getHorizontalChar(index);
+    public String getHorizontalSeparator(int col, int row) {
+        if (orientationHorizontalSeparator)
+            return getHorizontalChar(col);
         return getHorizontalChar(row);
     }
 
-    private String getVerticalSeparator(int index, int row) {
-        if (orientationVerticalSeparator) return getVerticalChar(index);
-        return getVerticalChar(row);
+    @Override
+    public String getVerticalSeparator(int col, int row) {
+        if (orientationVerticalSeparator)
+            return getVerticalChar(col).repeat(numberOfVerticalSeparators);
+        return getVerticalChar(row).repeat(numberOfVerticalSeparators);
     }
 
     private String getHorizontalChar(int index) {
-        int indexChar = index % horizontalSeparator.length;
+        int indexChar = Math.abs(index % horizontalSeparator.length);
         return String.valueOf(horizontalSeparator[indexChar]);
     }
 
     private String getVerticalChar(int index) {
-        int indexChar = index % verticalSeparator.length;
+        int indexChar = Math.abs(index % verticalSeparator.length);
         return String.valueOf(verticalSeparator[indexChar]);
     }
 }

@@ -1,20 +1,12 @@
-package com.gridnine.custom_classes.table_new.constructor.formatter;
-
-import com.gridnine.custom_classes.table_new.constructor.TableConstructorConfig;
+package com.gridnine.custom_classes.new_table.constructor.formatter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContentFormatterImpl implements ContentFormatter {
-    boolean isCellValueWrapping;
-    boolean isWordsWrapping;
-    int maxWidthColumn;
-
-    public ContentFormatterImpl(TableConstructorConfig config) {
-        isCellValueWrapping = config.isContentWrapping();
-        isWordsWrapping = config.isWordsWrapping();
-        maxWidthColumn = config.getMaxWidthColumn();
-    }
+    boolean isCellValueWrapping = true;
+    boolean isWordsWrapping = false;
+    int maxWidthColumn = 20;
 
     @Override
     public List<String> format(String text) {

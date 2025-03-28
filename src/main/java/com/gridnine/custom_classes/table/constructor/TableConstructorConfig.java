@@ -1,11 +1,12 @@
-package com.gridnine.custom_classes.table_new.constructor;
+package com.gridnine.custom_classes.table.constructor;
 
-import com.gridnine.custom_classes.table_new.constructor.alignment.Alignment;
-import com.gridnine.custom_classes.table_new.constructor.model.Cell;
+import com.gridnine.custom_classes.table.constructor.alignment.Alignment;
+import com.gridnine.custom_classes.table.constructor.constants.Color;
+import com.gridnine.custom_classes.table.constructor.model.Cell;
 
 import java.util.Map;
 
-import static com.gridnine.custom_classes.table_new.constructor.constants.Constants.*;
+import static com.gridnine.custom_classes.table.constructor.constants.Constants.*;
 
 public class TableConstructorConfig {
     private String verticalSeparator = DEFAULT_VERTICAL_SEPARATOR;
@@ -19,7 +20,8 @@ public class TableConstructorConfig {
     private boolean orientationVerticalSeparator = DEFAULT_ORIENTATION_VERTICAL_SEPARATOR;
     private boolean orientationHorizontalSeparator = DEFAULT_ORIENTATION_HORIZONTAL_SEPARATOR;
     private Map<Cell, Alignment> alignments = DEFAULT_ALIGNMENT;
-    private Map<Cell, String> colors = DEFAULT_COLOR;
+    private Map<Cell, Color> textColors = DEFAULT_TEXT_COLOR;
+    private Map<Cell, Color> bgColors = DEFAULT_BG_COLOR;
 
     public String getHorizontalSeparator() {
         return horizontalSeparator;
@@ -111,11 +113,19 @@ public class TableConstructorConfig {
         this.alignments = alignments;
     }
 
-    public Map<Cell, String> getColors() {
-        return colors;
+    public Map<Cell, Color> getTextColors() {
+        return textColors;
     }
 
-    public void setColors(Map<Cell, String> colors) {
-        this.colors = colors;
+    public void setTextColors(Map<Cell, Color> textColors) {
+        this.textColors = textColors;
+    }
+
+    public Map<Cell, Color> getBgColors() {
+        return bgColors;
+    }
+
+    public void setBgColors(Map<Cell, Color> bgColors) {
+        this.bgColors = bgColors;
     }
 }

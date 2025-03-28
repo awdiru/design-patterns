@@ -1,8 +1,8 @@
-package com.gridnine.custom_classes.table_new.constructor.constants;
+package com.gridnine.custom_classes.table.constructor.constants;
 
 
-import com.gridnine.custom_classes.table_new.constructor.alignment.Alignment;
-import com.gridnine.custom_classes.table_new.constructor.model.Cell;
+import com.gridnine.custom_classes.table.constructor.alignment.Alignment;
+import com.gridnine.custom_classes.table.constructor.model.Cell;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,5 +55,9 @@ public class Constants {
     /**
      * Цвет текста по умолчанию
      */
-    public static final Map<Cell, String> DEFAULT_COLOR = new HashMap<>();
+    public static final Map<Cell, Color> DEFAULT_TEXT_COLOR = new HashMap<>();
+    /**
+     * Цвет фона ячеек по умолчанию
+     */
+    public static final Map<Cell, Color> DEFAULT_BG_COLOR = new HashMap<>();
 }

@@ -1,4 +1,4 @@
-package com.gridnine.custom_classes.table_new.constructor.alignment;
+package com.gridnine.custom_classes.table.constructor.alignment;
 
 
 public class LeftAlignment extends AlignmentStrategy {

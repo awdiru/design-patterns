@@ -2,13 +2,14 @@ package com.gridnine.custom_classes.table;
 
 import com.gridnine.custom_classes.table.constructor.TableConstructor;
 import com.gridnine.custom_classes.table.constructor.TableConstructorBuilder;
+import com.gridnine.custom_classes.table.constructor.model.Cell;
 
 import java.util.List;
 
-import static com.gridnine.custom_classes.table.constructor.TableConstructorAlignment.*;
+import static com.gridnine.custom_classes.table.constructor.alignment.Alignment.*;
+import static com.gridnine.custom_classes.table.constructor.constants.Color.*;
 
-public class Client {
-
+class Client {
     public static void main(String[] args) {
         List<Student> studentList = List.of(new Student("Саша", 18, "name1@email.com"),
                 new Student("Гоша", 19, "name2@email.com"),
@@ -23,26 +24,28 @@ public class Client {
         List<Object> list4 = List.of(studentList.get(3), "Биология", "Нормально так сделал");
         List<Object> list5 = List.of(studentList.get(4), "Информатика", "Даже не приходил в учебное заведение");
 
-        TableConstructor tableConstructor = new TableConstructorBuilder()
-                .setHorizontalSeparator("_")
-                .setVerticalSeparator("|")
-                .setMaxWidthColumn(1)
-                .setNumberOfHorizontalSeparators(1)
-                .setNumberOfVerticalSeparators(1)
-                .setWordsWrapping(false)
-                .setCellValueWrapping(true)
-                .setOrientationVerticalSeparator(true)
-                .setOrientationHorizontalSeparator(true)
-                .setAlignment(HEADER_CENTER_ALIGNMENT, BODY_RIGHT_ALIGNMENT)
+        List<Cell> head = List.of(Cell.of(0, 0), Cell.of(0, 1), Cell.of(0, 2));
+        TableConstructor constructor = new TableConstructorBuilder()
+                .horizontalSeparator("_")
+                .verticalSeparator("|")
+                .maxWidthColumn(20)
+                .numberOfHorizontalSeparators(1)
+                .numberOfVerticalSeparators(1)
+                .wordsWrapping(false)
+                .contentWrapping(true)
+                .orientationVerticalSeparator(true)
+                .orientationHorizontalSeparator(true)
+                .addAlignments(CENTER, head)
+                .addAlignments(RIGHT, Cell.of(2,1))
+                .addColors(BLACK, head)
+                .addBgColors(PURPLE, head)
+                .addColors(BLACK, Cell.of(1,1))
+                .addBgColors(CYAN, Cell.of(1,1))
+                .addColors(RED, Cell.of(1,0))
+                .addBgColors(YELLOW, Cell.of(1,2))
                 .build();
 
-        String table = tableConstructor.getTable(studentHeader, list1, list2, list3, list4, list5);
+        String table = constructor.getTable(studentHeader, list1, list2, list3, list4, list5);
         System.out.println(table);
-
-        tableConstructor = new TableConstructor();
-        List<List<?>> lines = List.of(studentHeader, list1, list2, list3, list4, list5);
-        table = tableConstructor.getTable(lines);
-        System.out.println(table);
-
     }
 }

@@ -1,4 +1,4 @@
-package com.gridnine.custom_classes.table_new.constructor.alignment;
+package com.gridnine.custom_classes.new_table.constructor.alignment;
 
 public enum Alignment {
     /**
